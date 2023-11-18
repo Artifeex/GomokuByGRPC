@@ -1,0 +1,73 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+package grpc;
+option java_multiple_files = true;
+option java_package = "grpc";
+option java_outer_classname = "GameServiceProto";
+
+enum GameStatus {
+  WaitingPlayers = 0;
+  GameStarted = 1;
+  Draw = 2;
+  WinCross = 3;
+  WinZero = 4;
+}
+
+enum PlayerRole {
+    Cross = 0;
+    Zero = 1;
+}
+
+message StartGameMessage {
+  GameStatus gameStatus = 1;
+  PlayerRole playerRole = 2;
+  PlayerRole activePlayerRole = 3;
+}
+
+message GameStatusMessage {
+  GameStatus gameStatus = 1;
+}
+
+
+message TurnMessageRequest {
+  int32 rowIndex = 1;
+  int32 columnIndex = 2;
+
+  PlayerRole madeMove = 3;
+
+}
+// Его будет в ответ получать клиент, который
+message TurnMessageResponse {
+  bool isCorrectTurn = 1;
+  int32 rowIndex = 2;
+  int32 columnIndex = 3;
+  PlayerRole madeMove = 4;
+
+  GameStatus gameStatus = 5;
+
+  PlayerRole activeRole = 6;
+}
+
+message EnemyTurnMessage {
+  bool enemyTurned = 1;
+
+  int32 rowIndex = 2;
+  int32 columnIndex = 3;
+  PlayerRole madeMove = 4;
+
+  GameStatus gameStatus = 5;
+
+  PlayerRole activeRole = 6;
+}
+
+message EnemyRoleRequest {
+  PlayerRole myRole = 1;
+}
+
+
+service GameService {
+  rpc startGame(google.protobuf.Empty) returns(StartGameMessage);
+  rpc makeTurn(TurnMessageRequest) returns(TurnMessageResponse);
+  rpc getEnemyTurn(EnemyRoleRequest) returns(EnemyTurnMessage);
+  rpc getGameStatus(google.protobuf.Empty) returns(GameStatusMessage);
+}
