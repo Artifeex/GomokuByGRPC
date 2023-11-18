@@ -2,6 +2,7 @@ package com.example.gomokubygrpc;
 
 import com.google.protobuf.Empty;
 import grpc.*;
+import grpc.EnemyRoleRequest;
 import grpc.EnemyTurnMessage;
 import grpc.GameServiceGrpc;
 import grpc.GameStatus;
@@ -37,7 +38,7 @@ public class PlayerController {
     @FXML
     Label labelGameResult;
 
-    private PlayerRole myRole;
+    private volatile PlayerRole myRole;
     private PlayerRole activeRole;
     private GameStatus gameStatus;
 
@@ -57,11 +58,13 @@ public class PlayerController {
                     .setMadeMove(myRole)
                     .build();
             TurnMessageResponse response = client.makeTurn(request);
-            if(response.getIsCorrectTurn()) {
+
+            if (response.getIsCorrectTurn()) {
                 activeRole = response.getActiveRole();
                 gameStatus = response.getGameStatus();
                 updateLabels();
                 updateGridByTurn(response.getRowIndex(), response.getColumnIndex(), response.getMadeMove());
+
             } else {
                 //потенциально можно было бы сообщить, что именно не так произошло
             }
@@ -124,17 +127,18 @@ public class PlayerController {
                 });
 
                 while (gameStatus == GameStatus.GameStarted) {
-                    //читаем данные с сервера и ждем, когда поступят обновления
-                    if (activeRole != myRole) {
-                        EnemyTurnMessage turnMessage = client.getEnemyTurn(grpc.EnemyRoleRequest.newBuilder().setMyRole(myRole).build());
+                    if (myRole != activeRole) {
+                        EnemyRoleRequest request = grpc.EnemyRoleRequest.newBuilder().setMyRole(myRole).build();
+                        EnemyTurnMessage turnMessage = client.getEnemyTurn(request);
                         if (turnMessage.getEnemyTurned()) {
-                            //сходил и появились новые данные
+                            //сходил на сервер и там появились новые данные
                             activeRole = turnMessage.getActiveRole();
                             gameStatus = turnMessage.getGameStatus();
                             updateLabels();
                             updateGridByTurn(turnMessage.getRowIndex(), turnMessage.getColumnIndex(), turnMessage.getMadeMove());
                         }
                     }
+
                 }
                 gameEnd();
             }

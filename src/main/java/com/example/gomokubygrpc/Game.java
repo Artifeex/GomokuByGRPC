@@ -98,9 +98,9 @@ public class Game {
     private boolean checkDiagonalFromTopToLeft(int rowIndex, int columnIndex, Cell playerTurnCell) {
         int x = rowIndex;
         int y = columnIndex;
-        while (x < FIELD_SIZE - 1 && y < FIELD_SIZE - 1) {
+        while (x < FIELD_SIZE - 1 && y > 0) {
             x++;
-            y++;
+            y--;
         }
         int counter = 0;
         while (x >= 0 && y < FIELD_SIZE) {

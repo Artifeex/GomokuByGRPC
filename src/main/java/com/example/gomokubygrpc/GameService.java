@@ -52,7 +52,6 @@ public class GameService extends GameServiceGrpc.GameServiceImplBase {
 
     @Override
     public void makeTurn(TurnMessageRequest request, StreamObserver<TurnMessageResponse> responseObserver) {
-        System.out.println("Message from: " + request.getMadeMove());
         TurnMessageResponse response;
         if (!game.turn(request.getRowIndex(), request.getColumnIndex(), request.getMadeMove())) {
             response = TurnMessageResponse.newBuilder()
@@ -103,7 +102,6 @@ public class GameService extends GameServiceGrpc.GameServiceImplBase {
         }
         responseObserver.onNext(response);
         responseObserver.onCompleted();
-
     }
 
     public static void main(String[] args) throws Exception {

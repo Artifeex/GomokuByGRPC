@@ -12,7 +12,9 @@ public class LastStepHolder {
 
 
     public PlayerRole getLastStepPlayerRole() {
-        return lastStepPlayerRole;
+        synchronized (this) {
+            return lastStepPlayerRole;
+        }
     }
 
     public int getLastStepRowIndex() {
@@ -23,12 +25,11 @@ public class LastStepHolder {
         return lastStepColumnIndex;
     }
 
-
-
-
     public void addNewStep(int rowIndex, int columnIndex, PlayerRole lastStepPlayerRole) {
+        synchronized (this) {
             lastStepRowIndex = rowIndex;
             lastStepColumnIndex = columnIndex;
             this.lastStepPlayerRole = lastStepPlayerRole;
+        }
     }
 }
